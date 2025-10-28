@@ -1,0 +1,32 @@
+// export const snacks: Snack[] = [
+//     {
+//         name: "전자레인지 1분컷 초코칩쿠키",
+//         description: "전자레인지로 간단하게 1분 만에 만들 수 있는 초코칩 쿠키 레시피 영상입니다.",
+//         tags: ["#전자레인지", "#초코칩", "#쿠키"],
+//         image: "https://img.youtube.com/vi/z4ysBFhfG9E/maxresdefault.jpg",
+//         link: "https://www.youtube.com/shorts/z4ysBFhfG9E",
+//         category: "쿠키",
+//         author: "오늘 뭐 먹지?",
+//         license: "CC BY",
+//     },
+//     {
+//         name: "라이스페이퍼 김치전",
+//         description: "라이스페이퍼를 활용해 바삭하게 만든 김치전 레시피 영상입니다.",
+//         tags: ["#후라이팬", "#라이스페이퍼", "#김치전"],
+//         image: "https://img.youtube.com/vi/77KTyGtDCU8/maxresdefault.jpg",
+//         link: "https://www.youtube.com/shorts/77KTyGtDCU8",
+//         category: "전/부침개",
+//         author: "오늘 뭐 먹지?",
+//         license: "CC BY",
+//     },
+//     {
+//         name: "또띠아 크로와상",
+//         description: "또띠아를 활용해 쫀득한 식감이 너무 좋고 딸기잼에 찍먹하면 단짠 조합이 좋은 레시피 영상입니다.",
+//         tags: ["#에어프라이어", "#또띠아", "#크로와상"],
+//         image: "https://img.youtube.com/vi/SqfqTLp7T2A/maxresdefault.jpg",
+//         link: "https://www.youtube.com/shorts/SqfqTLp7T2A",
+//         category: "빵",
+//         author: "오늘 뭐 먹지?",
+//         license: "CC BY",
+//     },
+// ];

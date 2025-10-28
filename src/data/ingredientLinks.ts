@@ -1,0 +1,16 @@
+// export const ingredientLinks: Record<string, string> = {
+//     설탕: "https://www.coupang.com/sugar",
+//     우유: "https://www.coupang.com/milk",
+//     버터: "https://www.coupang.com/butter",
+//     밀가루: "https://www.coupang.com/flour",
+//     초코칩: "https://www.coupang.com/chocochip",
+//     김치: "https://www.coupang.com/test",
+//     베이컨: "https://www.coupang.com/test",
+//     라이스페이퍼: "https://www.coupang.com/test",
+//     식용유: "https://www.coupang.com/test",
+//     피자치즈: "https://www.coupang.com/test",
+//     또띠아: "https://www.coupang.com/test",
+//     슬라이스치즈: "https://www.coupang.com/test",
+//     계란: "https://www.coupang.com/test",
+//     검은깨: "https://www.coupang.com/test",
+// };
