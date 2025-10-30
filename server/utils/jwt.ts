@@ -4,13 +4,14 @@ const SECRET_KEY = process.env.JWT_SECRET as string;
 
 export interface DecodedToken {
     id: number | string; // generateToken에서 넣은 userId
+    role: string;
     iat?: number;
     exp?: number;
 }
 
-export const generateToken = (userId: number | string) => {
-    return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: "1h" });
-};
+export function generateToken(user: { id: number; role: string }) {
+    return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "1h" });
+}
 
 // 반환 타입 명시
 export const verifyToken = (token: string): DecodedToken | null => {

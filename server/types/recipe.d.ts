@@ -2,8 +2,9 @@
 
 export interface Recipe {
     id: number;
-    title: string;
-    description: string;
+    name: string;
+    author: string;
+    license: string | null;
     created_at: Date;
     updated_at: Date;
 }
@@ -36,4 +37,5 @@ export interface Image {
     folder: string;
     file_name: string;
     step_number: number | null;
+    image_order: number | null;
 }

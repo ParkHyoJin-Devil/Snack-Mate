@@ -14,9 +14,10 @@ router.post("/register", async (req, res) => {
         const existingUser = await getUserByEmail(email);
         if (existingUser) return res.status(400).json({ message: "이미 존재하는 이메일입니다." });
 
-        const newUser = await createUser(email, password, nickname);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await createUser(email, hashedPassword, nickname);
 
-        const token = generateToken(newUser.id);
+        const token = generateToken({ id: newUser.id, role: newUser.role });
         res.status(201).json({ token, user: { id: newUser.id, email: newUser.email, nickname: newUser.nickname } });
     } catch (err) {
         console.error("회원가입 처리 중 오류:", err);
@@ -35,7 +36,7 @@ router.post("/login", async (req, res) => {
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
 
-        const token = generateToken(user.id);
+        const token = generateToken({ id: user.id, role: user.role || "user" });
         res.json({ token, user: { id: user.id, email: user.email, nickname: user.nickname } });
     } catch (err) {
         console.error("로그인 처리 중 오류:", err);

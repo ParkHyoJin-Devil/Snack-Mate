@@ -56,7 +56,7 @@ router.get("/:id", async (req, res) => {
         ]);
         const [tools] = await db.query<RowDataPacket[]>("SELECT * FROM recipe_tools WHERE recipe_id = ?", [recipeId]);
         const [images] = await db.query<RowDataPacket[]>(
-            "SELECT * FROM recipe_images WHERE recipe_id = ? ORDER BY step_number",
+            "SELECT * FROM recipe_images WHERE recipe_id = ? ORDER BY step_number, image_order",
             [recipeId]
         );
 

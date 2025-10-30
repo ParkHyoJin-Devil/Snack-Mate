@@ -1,20 +1,56 @@
 import { Router } from "express";
 import nodemailer from "nodemailer";
 import { db } from "../db";
+import { RowDataPacket } from "mysql2";
+
+// 환경변수가 없으면 경고 출력
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ 이메일 환경변수가 설정되지 않았습니다!");
+    console.error("EMAIL_USER:", process.env.EMAIL_USER);
+    console.error("EMAIL_PASS:", process.env.EMAIL_PASS ? "설정됨" : "설정 안됨");
+}
 
 const router = Router();
 
-// 이메일 발송을 위한 transporter 설정 (Gmail 예시)
+// 서버 시작 시 환경변수 출력
+console.log("=".repeat(60));
+console.log("📧 이메일 설정 초기화");
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS 존재 여부:", !!process.env.EMAIL_PASS);
+console.log("EMAIL_PASS 길이:", process.env.EMAIL_PASS?.length);
+console.log("=".repeat(60));
+
+// 이메일 발송을 위한 transporter 설정 (Naver 메일)
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.naver.com",
+    port: 587, // TLS 포트
+    secure: false, // TLS 사용
+    requireTLS: true, // TLS 필요
     auth: {
-        user: process.env.EMAIL_USER || "your-email@gmail.com", // 환경변수에서 이메일 주소
-        pass: process.env.EMAIL_PASS || "your-app-password", // 환경변수에서 앱 비밀번호
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
+    // 디버깅 설정
+    debug: process.env.NODE_ENV === "development",
+    logger: process.env.NODE_ENV === "development",
+    // 타임아웃 설정
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000,
 });
+
+// Transporter 생성 확인
+console.log("🚀 SMTP Transporter 생성됨");
+console.log("사용자:", process.env.EMAIL_USER);
+console.log("서버:", "smtp.naver.com:587");
 
 // 이메일 설정 확인
 const isEmailConfigured = () => {
+    // 개발 환경에서는 항상 true 반환 (테스트용)
+    if (process.env.NODE_ENV === "development") {
+        return true;
+    }
+
     return (
         process.env.EMAIL_USER &&
         process.env.EMAIL_PASS &&
@@ -31,6 +67,13 @@ router.post("/send-verification", async (req, res) => {
     try {
         const { email } = req.body;
 
+        // 이메일 설정 확인
+        if (!isEmailConfigured()) {
+            return res.status(500).json({
+                message: "이메일 계정 설정이 올바르지 않습니다. 관리자에게 문의하세요.",
+            });
+        }
+
         // 이메일 형식 검증
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -38,7 +81,7 @@ router.post("/send-verification", async (req, res) => {
         }
 
         // 이미 가입된 이메일인지 확인
-        const [existingUsers] = await db.query("SELECT id FROM users WHERE email = ?", [email]);
+        const [existingUsers] = await db.query<RowDataPacket[]>("SELECT id FROM users WHERE email = ?", [email]);
         if (existingUsers.length > 0) {
             return res.status(400).json({ message: "이미 가입된 이메일입니다." });
         }
@@ -72,12 +115,56 @@ router.post("/send-verification", async (req, res) => {
             `,
         };
 
-        await transporter.sendMail(mailOptions);
+        try {
+            await transporter.sendMail(mailOptions);
 
-        res.json({
-            message: "인증번호가 발송되었습니다. 이메일을 확인해주세요.",
-            success: true,
-        });
+            console.log("=".repeat(50));
+            console.log("📧 이메일 발송 성공");
+            console.log(`수신자: ${email}`);
+            console.log(`인증번호: ${verificationCode}`);
+            console.log("=".repeat(50));
+
+            res.json({
+                message: "인증번호가 발송되었습니다. 이메일을 확인해주세요.",
+                success: true,
+                developmentCode: process.env.NODE_ENV === "development" ? verificationCode : undefined, // 개발용으로만 인증번호 반환
+            });
+        } catch (emailError: unknown) {
+            console.error("이메일 발송 실패:", emailError);
+            console.error("에러 타입:", typeof emailError);
+
+            // Error 타입으로 변환하여 속성에 접근
+            const error = emailError as Error & { code?: string };
+            console.error("에러 코드:", error.code);
+            console.error("에러 메시지:", error.message);
+
+            // Naver SMTP 관련 에러 확인
+            if (error.code === "EAUTH") {
+                console.error("❌ 인증 실패: 이메일 주소나 비밀번호가 올바르지 않습니다.");
+            } else if (error.code === "ECONNECTION") {
+                console.error("❌ 연결 실패: SMTP 서버에 연결할 수 없습니다.");
+            } else if (error.code === "ESOCKET") {
+                console.error("❌ 소켓 에러: 네트워크 연결 문제가 있습니다.");
+            }
+
+            // 이메일 발송 실패 시 개발 환경에서는 fallback으로 콘솔 출력
+            if (process.env.NODE_ENV === "development") {
+                console.log("=".repeat(50));
+                console.log("📧 이메일 발송 실패 - 개발 환경 fallback");
+                console.log(`이메일: ${email}`);
+                console.log(`인증번호: ${verificationCode}`);
+                console.log("=".repeat(50));
+
+                res.json({
+                    message: `이메일 발송에 실패했습니다. 개발 환경이므로 콘솔을 확인해주세요. (인증번호: ${verificationCode})`,
+                    success: true,
+                    developmentCode: verificationCode,
+                    emailSendFailed: true,
+                });
+            } else {
+                throw emailError; // 프로덕션에서는 에러를 throw하여 catch 블록에서 처리
+            }
+        }
     } catch (error) {
         console.error("이메일 발송 실패:", error);
 

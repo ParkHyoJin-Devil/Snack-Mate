@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { HeaderBlock, HeaderContent, Logo, AuthButtons } from "../styles/components/Header.styles";
 import { useAuth } from "../hooks/useAuth";
@@ -26,6 +25,9 @@ const Header: React.FC<HeaderProps> = () => {
                 {token && user ? (
                     <>
                         <span>{user.nickname ? `${user.nickname}님 환영합니다` : ""}</span>
+                        {user.role === 'admin' && (
+                            <button onClick={() => navigate("/admin")}>관리자</button>
+                        )}
                         <button onClick={handleLogout}>로그아웃</button>
                     </>
                 ) : (

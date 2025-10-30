@@ -1,4 +1,3 @@
-import React from "react";
 import { CTASection } from "../styles/components/CTA.styles";
 
 interface CTAProps {

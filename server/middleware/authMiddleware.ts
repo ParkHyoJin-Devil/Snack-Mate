@@ -1,7 +1,7 @@
 import { Request as ExRequest, Response, NextFunction } from "express";
 import { verifyToken, DecodedToken } from "../utils/jwt";
 
-interface AuthRequest extends ExRequest {
+export interface AuthRequest extends ExRequest {
     user?: DecodedToken;
 }
 
@@ -16,4 +16,13 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
     req.user = decoded;
     next();
+};
+
+export const adminMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+    authMiddleware(req, res, () => {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ message: "관리자 권한이 필요합니다." });
+        }
+        next();
+    });
 };

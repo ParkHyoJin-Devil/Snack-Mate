@@ -70,6 +70,7 @@ export interface RecipeImage {
     step_number: number;
     folder: string;
     file_name: string;
+    image_order: number | null;
 }
 
 export interface RecipeStep {

@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
         // 3. JWT 발급
         const userId = result.insertId;
-        const token = generateToken(userId);
+        const token = generateToken({ id: userId, role: "user" });
 
         res.json({ token });
     } catch (err) {

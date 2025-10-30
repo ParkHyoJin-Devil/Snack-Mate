@@ -2,14 +2,7 @@ import { Router } from "express";
 import { db } from "../db";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
-import { RowDataPacket } from "mysql2";
-
-interface UserRow extends RowDataPacket {
-    id: number;
-    nickname: string;
-    email: string;
-    password: string;
-}
+import { User } from "../types/user";
 
 const router = Router();
 
@@ -18,7 +11,7 @@ router.post("/", async (req, res) => {
 
     try {
         // nickname, email도 같이 SELECT
-        const [rows] = await db.query<UserRow[]>("SELECT id, nickname, email, password FROM users WHERE email = ?", [
+        const [rows] = await db.query<User[]>("SELECT id, nickname, email, password, role FROM users WHERE email = ?", [
             email,
         ]);
 
@@ -33,7 +26,7 @@ router.post("/", async (req, res) => {
             return res.status(401).json({ message: "비밀번호 틀림" });
         }
 
-        const token = generateToken(user.id);
+        const token = generateToken({ id: user.id, role: user.role });
 
         // 클라이언트로 user 정보 전체 전송
         res.json({
@@ -42,6 +35,7 @@ router.post("/", async (req, res) => {
                 id: user.id,
                 nickname: user.nickname,
                 email: user.email,
+                role: user.role,
             },
         });
     } catch (err) {

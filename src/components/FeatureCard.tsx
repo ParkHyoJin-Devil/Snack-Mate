@@ -1,4 +1,3 @@
-import React from "react";
 import { Card } from "../styles/components/FeatureCard.styles";
 
 interface FeatureCardProps {

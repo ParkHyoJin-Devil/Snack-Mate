@@ -5,6 +5,7 @@ import * as S from "../styles/components/SnackCard.styles";
 import type { Snack } from "../types/index";
 import type { RecipeStep, DBRecipeData } from "../types";
 import { useFetchMap } from "../hooks/useFetchMap";
+import { sortImagesByOrder } from "../utils/imageUtils";
 
 interface SnackCardProps {
     snack: Snack;
@@ -45,12 +46,15 @@ const SnackCard: React.FC<SnackCardProps> = ({ snack, onTagClick }) => {
                     amount: ing.amount,
                 })),
                 tools: data.tools.map((t) => t.name),
-                images: data.images
-                    .filter((img) => img.step_number === step.step_number)
-                    .map((img) => ({
-                        folder: img.folder,
-                        file_name: img.file_name,
-                    })),
+                images: sortImagesByOrder(
+                    data.images
+                        .filter((img) => img.step_number === step.step_number)
+                        .map((img) => ({
+                            folder: img.folder,
+                            file_name: img.file_name,
+                            image_order: img.image_order,
+                        }))
+                ),
                 author: step.author ?? data.recipe.author,
                 license: step.license ?? "Unknown",
             }));

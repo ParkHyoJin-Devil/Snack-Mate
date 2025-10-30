@@ -10,8 +10,8 @@ interface JwtPayload {
 
 export interface AuthContextType {
     token: string | null;
-    user: { id: number; nickname: string; email: string } | null;
-    login: (token: string, user: { id: number; nickname: string; email: string }) => void;
+    user: { id: number; nickname: string; email: string; role: string } | null;
+    login: (token: string, user: { id: number; nickname: string; email: string; role: string }) => void;
     logout: () => void;
 }
 
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     }, [token]);
 
-    const login = (newToken: string, newUser: { id: number; nickname: string; email: string }) => {
+    const login = (newToken: string, newUser: { id: number; nickname: string; email: string; role: string }) => {
         localStorage.setItem("token", newToken);
         localStorage.setItem("user", JSON.stringify(newUser));
         setToken(newToken);

@@ -1,4 +1,3 @@
-import React from "react";
 import { Container, NavButton, PageButton } from "../styles/components/Pagination.styles";
 
 interface PaginationProps {

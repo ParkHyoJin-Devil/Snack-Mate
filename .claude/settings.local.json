@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(node:*)",
+      "Bash(mysql:*)",
+      "Read(//c/Users/Devil/Pictures/Screenshots/**)",
+      "Bash(curl:*)",
+      "Bash(npm run server:*)",
+      "Bash(npm run dev:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(tsx:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

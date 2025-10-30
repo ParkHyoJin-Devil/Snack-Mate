@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "../styled";
 
 export const LoginContainer = styled.main`
     display: flex;
