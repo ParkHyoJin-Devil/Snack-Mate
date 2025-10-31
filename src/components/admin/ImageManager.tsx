@@ -34,14 +34,11 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         setFormData({ ...formData, steps: newSteps });
     };
 
-    const getImagesByStep = (): { stepImages: { [key: number]: FormDataImage[] }, generalImages: FormDataImage[] } => {
+    const getImagesByStep = () => {
         const stepImages: { [key: number]: FormDataImage[] } = {};
-        const generalImages: FormDataImage[] = [];
 
         formData.images.forEach((image) => {
-            if (!image.step_number) {
-                generalImages.push(image);
-            } else {
+            if (image.step_number) {
                 if (!stepImages[image.step_number]) {
                     stepImages[image.step_number] = [];
                 }
@@ -54,10 +51,7 @@ const ImageManager: React.FC<ImageManagerProps> = ({
             stepImages[parseInt(stepNum)] = sortImagesByOrder<FormDataImage>(stepImages[parseInt(stepNum)]);
         });
 
-        // 전체 이미지도 image_order 순서대로 정렬
-        const sortedGeneralImages = sortImagesByOrder<FormDataImage>(generalImages);
-
-        return { stepImages, generalImages: sortedGeneralImages };
+        return stepImages;
     };
 
     const processFiles = (files: File[], stepNumber: number, slotIndex: number) => {
@@ -101,57 +95,14 @@ const ImageManager: React.FC<ImageManagerProps> = ({
         reader.readAsDataURL(file);
     };
 
-    const { generalImages } = getImagesByStep();
+    const stepImages = getImagesByStep();
 
     return (
         <SubSection>
             <SubSectionTitle>📸 단계별 레시피 이미지</SubSectionTitle>
 
-  
-            {/* 일반 이미지 (단계 지정 안됨) */}
-            {generalImages.length > 0 && (
-                <StepImageContainer>
-                    <div className="step-header">
-                        <div className="step-badge">📷</div>
-                        <div className="step-title">전체 레시피 이미지</div>
-                        <div className="image-count">{generalImages.length}개</div>
-                    </div>
-                    <StepImageGrid>
-                        {generalImages.map((image: FormDataImage, index: number) => (
-                            <ImagePreview key={`general-${index}`}>
-                                <img
-                                    src={getImageUrl(image)}
-                                    alt={image.file_name}
-                                    onError={(e) => {
-                                        e.currentTarget.src = "/images/placeholder.png";
-                                    }}
-                                />
-                                <div className="image-info">
-                                    <div className="filename">{image.file_name}</div>
-                                    {image.provider && (
-                                        <div className="provider">제공: {image.provider}</div>
-                                    )}
-                                    {image.imageLicense && (
-                                        <div className="license">{image.imageLicense}</div>
-                                    )}
-                                    <div className="step-info">전체</div>
-                                </div>
-                                <button
-                                    className="remove-image"
-                                    onClick={() => removeImage(formData.images.indexOf(image))}
-                                    title="이미지 삭제"
-                                >
-                                    ×
-                                </button>
-                            </ImagePreview>
-                        ))}
-                    </StepImageGrid>
-                </StepImageContainer>
-            )}
-
             {/* 단계별 이미지 */}
             {formData.steps.map((step: FormDataStep) => {
-                const { stepImages } = getImagesByStep();
                 const currentStepImages = stepImages[step.step_number] || [];
 
                 return (

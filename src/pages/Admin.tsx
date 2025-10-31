@@ -49,14 +49,15 @@ const Admin: React.FC = () => {
     // Form state
     const [formData, setFormData] = useState<RecipeFormData>({
         title: "",
-        author: "",
         provider: "",
         recipeLicense: "",
+        recipeLink: "",
+        category: "",
         license: "",
         steps: [{ step_number: 1, description: "", author: "", license: "" }],
         ingredients: [{ name: "", amount: "" }],
         tools: [{ name: "" }],
-        images: [{ folder: "", file_name: "", step_number: undefined }],
+        images: [{ folder: "", file_name: "", step_number: 1 }],
     });
 
     const getAuthHeaders = () => {
@@ -104,19 +105,22 @@ const Admin: React.FC = () => {
 
     const handleEdit = async (recipeId: number) => {
         try {
+            const headers = getAuthHeaders();
+
             const response = await fetch(`http://localhost:3001/api/admin/recipes/${recipeId}`, {
-                headers: getAuthHeaders(),
+                headers: headers,
             });
 
             if (response.ok) {
                 const recipeData = await response.json();
-                console.log("기존 레시피 데이터:", recipeData); // 디버깅용
+
                 setSelectedRecipe(recipeData);
                 setFormData({
-                    title: recipeData.recipe.name || recipeData.recipe.title || "",
-                    author: recipeData.recipe.author || "",
+                    title: recipeData.recipe.title || "",
                     provider: recipeData.recipe.provider || "",
                     recipeLicense: recipeData.recipe.recipeLicense || "",
+                    recipeLink: recipeData.recipe.link || "",
+                    category: recipeData.recipe.category || "",
                     license: recipeData.recipe.license || "",
                     steps: recipeData.steps.length > 0 ? recipeData.steps.map((step: FormDataStep) => ({
                         ...step,
@@ -178,21 +182,27 @@ const Admin: React.FC = () => {
 
             const method = isEditMode ? "PUT" : "POST";
 
-            // 서버가 받는 필드명에 맞춰 데이터 변환
-            const serverData = {
-                title: formData.title, // 서버는 name 필드를 받지만 title로 보내도 됨
-                author: formData.author,
-                license: formData.license,
-                steps: formData.steps,
-                ingredients: formData.ingredients,
-                tools: formData.tools,
-                images: formData.images
-            };
+            // FormData로 파일 전송
+            const formDataToSend = new FormData();
+            formDataToSend.append('title', formData.title);
+            formDataToSend.append('provider', formData.provider || '');
+            formDataToSend.append('recipeLicense', formData.recipeLicense || '');
+            formDataToSend.append('recipeLink', formData.recipeLink || '');
+            formDataToSend.append('category', formData.category || '');
+            formDataToSend.append('author', ""); // 빈 문자열로 보내서 호환성 유지
+            formDataToSend.append('license', formData.license || '');
+
+            // 썸네일 파일이 있으면 추가
+            if (formData.thumbnailFile) {
+                formDataToSend.append('thumbnail', formData.thumbnailFile);
+            }
 
             const response = await fetch(url, {
                 method,
-                headers: getAuthHeaders(),
-                body: JSON.stringify(serverData),
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: formDataToSend,
             });
 
             if (response.ok) {
@@ -224,14 +234,15 @@ const Admin: React.FC = () => {
     const resetForm = () => {
         setFormData({
             title: "",
-            author: "",
             provider: "",
             recipeLicense: "",
+            recipeLink: "",
+            category: "",
             license: "",
             steps: [{ step_number: 1, description: "", author: "", license: "" }],
             ingredients: [{ name: "", amount: "" }],
             tools: [{ name: "" }],
-            images: [{ folder: "", file_name: "", step_number: undefined }],
+            images: [{ folder: "", file_name: "", step_number: 1 }],
         });
         setSelectedRecipe(null);
     };
@@ -281,7 +292,6 @@ const Admin: React.FC = () => {
                         <SidebarButton $active onClick={() => {}}>
                             📊 대시보드
                         </SidebarButton>
-                        <SidebarButton onClick={() => navigate("/")}>🏠 홈으로</SidebarButton>
                         <SidebarButton onClick={() => navigate("/recipes")}>🍳 레시피 목록</SidebarButton>
                         <SidebarButton onClick={() => alert("개발 예정")}>👥 사용자 관리</SidebarButton>
                         <SidebarButton onClick={() => alert("개발 예정")}>📈 통계 분석</SidebarButton>
@@ -309,7 +319,7 @@ const Admin: React.FC = () => {
                                     <RecipeInfo>
                                         <RecipeName>{recipe.title}</RecipeName>
                                         <RecipeMeta>
-                                            👨‍🍳 작성자: {recipe.author} | 📅 생성일:{" "}
+                                            📅 생성일:{" "}
                                             {new Date(recipe.created_at).toLocaleDateString()}
                                         </RecipeMeta>
                                     </RecipeInfo>

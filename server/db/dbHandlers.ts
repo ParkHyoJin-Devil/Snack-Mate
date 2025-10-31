@@ -14,7 +14,8 @@ export function createGetAllHandler(tableName: string, columns: string[] = ["*"]
             res.json(rows);
         } catch (err) {
             console.error(`${tableName} 조회 실패:`, err);
-            res.status(500).json({ message: "DB 조회 실패" });
+            console.error('에러 상세:', JSON.stringify(err, null, 2));
+            res.status(500).json({ message: "DB 조회 실패", error: err?.message || 'Unknown error' });
         }
     };
 }
@@ -42,6 +43,53 @@ export async function createUser(
         nickname,
         role: "user",
     };
+}
+
+// snacks 테이블 관련 CRUD 핸들러들
+export async function createSnack(data: {
+    title: string;
+    thumbnail_file_name?: string;
+    link?: string;
+    category?: string;
+    author?: string;
+    license?: string;
+}): Promise<number> {
+    const [result] = await db.query<ResultSetHeader>(
+        `INSERT INTO snacks (title, thumbnail_file_name, link, category, author, license)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+            data.title,
+            data.thumbnail_file_name || null,
+            data.link || null,
+            data.category || null,
+            data.author || null,
+            data.license || null
+        ]
+    );
+    return result.insertId;
+}
+
+export async function updateSnack(id: number, data: {
+    title: string;
+    thumbnail_file_name?: string;
+    link?: string;
+    category?: string;
+    author?: string;
+    license?: string;
+}): Promise<void> {
+    await db.query(
+        `UPDATE snacks SET title = ?, thumbnail_file_name = ?, link = ?, category = ?, author = ?, license = ?
+         WHERE id = ?`,
+        [
+            data.title,
+            data.thumbnail_file_name || null,
+            data.link || null,
+            data.category || null,
+            data.author || null,
+            data.license || null,
+            id
+        ]
+    );
 }
 
 // 레시피 관련 CRUD 핸들러들

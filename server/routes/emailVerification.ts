@@ -3,22 +3,9 @@ import nodemailer from "nodemailer";
 import { db } from "../db";
 import { RowDataPacket } from "mysql2";
 
-// 환경변수가 없으면 경고 출력
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ 이메일 환경변수가 설정되지 않았습니다!");
-    console.error("EMAIL_USER:", process.env.EMAIL_USER);
-    console.error("EMAIL_PASS:", process.env.EMAIL_PASS ? "설정됨" : "설정 안됨");
-}
 
 const router = Router();
 
-// 서버 시작 시 환경변수 출력
-console.log("=".repeat(60));
-console.log("📧 이메일 설정 초기화");
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS 존재 여부:", !!process.env.EMAIL_PASS);
-console.log("EMAIL_PASS 길이:", process.env.EMAIL_PASS?.length);
-console.log("=".repeat(60));
 
 // 이메일 발송을 위한 transporter 설정 (Naver 메일)
 const transporter = nodemailer.createTransport({
@@ -39,10 +26,6 @@ const transporter = nodemailer.createTransport({
     socketTimeout: 60000,
 });
 
-// Transporter 생성 확인
-console.log("🚀 SMTP Transporter 생성됨");
-console.log("사용자:", process.env.EMAIL_USER);
-console.log("서버:", "smtp.naver.com:587");
 
 // 이메일 설정 확인
 const isEmailConfigured = () => {
@@ -118,12 +101,7 @@ router.post("/send-verification", async (req, res) => {
         try {
             await transporter.sendMail(mailOptions);
 
-            console.log("=".repeat(50));
-            console.log("📧 이메일 발송 성공");
-            console.log(`수신자: ${email}`);
-            console.log(`인증번호: ${verificationCode}`);
-            console.log("=".repeat(50));
-
+            
             res.json({
                 message: "인증번호가 발송되었습니다. 이메일을 확인해주세요.",
                 success: true,
@@ -149,12 +127,7 @@ router.post("/send-verification", async (req, res) => {
 
             // 이메일 발송 실패 시 개발 환경에서는 fallback으로 콘솔 출력
             if (process.env.NODE_ENV === "development") {
-                console.log("=".repeat(50));
-                console.log("📧 이메일 발송 실패 - 개발 환경 fallback");
-                console.log(`이메일: ${email}`);
-                console.log(`인증번호: ${verificationCode}`);
-                console.log("=".repeat(50));
-
+                
                 res.json({
                     message: `이메일 발송에 실패했습니다. 개발 환경이므로 콘솔을 확인해주세요. (인증번호: ${verificationCode})`,
                     success: true,

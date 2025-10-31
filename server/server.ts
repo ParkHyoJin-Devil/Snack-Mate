@@ -20,11 +20,18 @@ const PORT = process.env.PORT || 3001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 app.use(cors());
 app.use(express.json());
 
 // DB 인스턴스를 라우트에서 접근 가능하도록 설정
 app.locals.db = db;
+
+// 로컬 이미지 제공
+if (process.env.NODE_ENV !== "production") {
+    const imagesPath = path.resolve(__dirname, "../../images");
+    app.use("/images", express.static(imagesPath));
+}
 
 // API 라우트
 app.use("/api/snacks", snacksRouter);
@@ -35,28 +42,6 @@ app.use("/api/register", registerRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/email", emailVerificationRouter);
 app.use("/api/admin", adminRouter);
-
-// 로컬 이미지 제공
-if (process.env.NODE_ENV !== "production") {
-    const imagesPath = path.resolve(__dirname, "../../images");
-
-    // 이미지 요청 확인용 로그
-    app.use("/images", (req, res, next) => {
-        const imagesPath = path.resolve(__dirname, "../images");
-        const requestedPath = path.join(imagesPath, req.path);
-        console.log("Requested image URL:", req.url);
-        console.log("Resolved file path:", requestedPath);
-        next();
-    });
-
-    app.use("/images", express.static(imagesPath));
-}
-
-// 요청 로깅
-app.use((req, res, next) => {
-    console.log(req.url);
-    next();
-});
 
 // 서버 시작 (한 번만)
 app.listen(PORT, () => {

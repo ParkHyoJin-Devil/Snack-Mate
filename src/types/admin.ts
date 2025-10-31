@@ -1,7 +1,6 @@
 export interface Recipe {
     id: number;
     title: string;
-    author: string;
     provider?: string;
     recipeLicense?: string;
     created_at: string;
@@ -38,7 +37,7 @@ export interface FormDataImage {
     id?: number;
     folder: string;
     file_name: string;
-    step_number?: number | null;
+    step_number: number;
     image_order?: number | null;
     preview?: string;
     file?: File;
@@ -73,10 +72,12 @@ export interface Stats {
 
 export interface FormData {
     title: string;
-    author: string;
     provider?: string;
     recipeLicense?: string;
+    recipeLink?: string;
+    category?: string;
     license?: string;
+    thumbnailFile?: File;
     steps: FormDataStep[];
     ingredients: FormDataIngredient[];
     tools: FormDataTool[];

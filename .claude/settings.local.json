@@ -16,7 +16,11 @@
       "WebFetch(domain:localhost)",
       "Bash(tsx:*)",
       "Bash(npx tsx:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(set:*)",
+      "Bash(del:*)",
+      "Bash(powershell \"Stop-Process -Name node -Force\")"
     ],
     "deny": [],
     "ask": []

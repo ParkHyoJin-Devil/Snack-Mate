@@ -52,7 +52,6 @@ export default function LoginPage() {
             });
 
             const data = await res.json();
-            console.log("로그인 API 응답:", data);
 
             if (!res.ok) {
                 setError(data.message || "로그인 실패");

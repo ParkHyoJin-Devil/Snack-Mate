@@ -32,8 +32,7 @@ import {
 interface SnackFromDB {
     id: number;
     title: string;
-    description: string;
-    thumbnail_url: string;
+    thumbnail_file_name: string;
     link: string;
     category: string;
     author: string;
@@ -59,8 +58,8 @@ export default function SnacksPage() {
                 const formatted: Snack[] = data.map((item, index) => ({
                     id: item.id ?? index, // DB에서 id 없으면 index로 임시 생성
                     name: item.title,
-                    description: item.description,
-                    image: item.thumbnail_url,
+                    description: "", // description 필드 제거
+                    image: item.thumbnail_file_name ? `${import.meta.env.VITE_IMAGE_BASE_URL}/Thumbnail/${item.thumbnail_file_name}` : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23e0e0e0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%23666666'%3ENo Image%3C/text%3E%3C/svg%3E",
                     link: item.link,
                     category: item.category,
                     author: item.author,

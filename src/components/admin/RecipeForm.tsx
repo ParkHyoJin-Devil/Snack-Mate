@@ -52,7 +52,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             steps: { step_number: currentArray.length + 1, description: "", author: "", license: "" },
             ingredients: { name: "", amount: "" },
             tools: { name: "" },
-            images: { folder: "", file_name: "", step_number: undefined },
+            images: { folder: "", file_name: "", step_number: 1 },
         };
 
         setFormData({
@@ -98,17 +98,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                         />
                     </FormGroup>
 
-                    <FormGroup>
-                        <Label>레시피 작성자 *</Label>
-                        <Input
-                            type="text"
-                            value={formData.author || ""}
-                            onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                            placeholder="레시피를 만든 사람 또는 출처"
-                            required
-                        />
-                    </FormGroup>
-
+                    
                     <FormGroup>
                         <Label>레시피 제공자</Label>
                         <Input
@@ -117,6 +107,54 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                             onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
                             placeholder="레시피 영상/콘텐츠 제공자 (예: OO 유튜브 채널)"
                         />
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label>레시피 링크</Label>
+                        <Input
+                            type="url"
+                            value={formData.recipeLink || ""}
+                            onChange={(e) => setFormData({ ...formData, recipeLink: e.target.value })}
+                            placeholder="레시피 원본 영상/페이지 링크 (예: https://youtube.com/...)"
+                        />
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label>레시피 카테고리</Label>
+                        <Input
+                            type="text"
+                            value={formData.category || ""}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            placeholder="레시피 카테고리 (예: 간식, 디저트, 음료)"
+                        />
+                    </FormGroup>
+
+                    <FormGroup>
+                        <Label>썸네일 이미지</Label>
+                        <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    setFormData({ ...formData, thumbnailFile: file });
+                                }
+                            }}
+                        />
+                        {formData.thumbnailFile && (
+                            <div style={{ marginTop: "1rem" }}>
+                                <div style={{ fontSize: "0.9rem", color: "#666", marginBottom: "0.5rem" }}>
+                                    선택된 파일: {formData.thumbnailFile.name}
+                                </div>
+                                <div style={{ marginTop: "0.5rem" }}>
+                                    <img
+                                        src={URL.createObjectURL(formData.thumbnailFile)}
+                                        alt="썸네일 미리보기"
+                                        style={{ maxWidth: "200px", maxHeight: "150px", objectFit: "cover", border: "1px solid #ddd", borderRadius: "8px" }}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </FormGroup>
 
                     <FormGroup>
